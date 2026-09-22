@@ -26,6 +26,7 @@ U1 = ("<image><image>\nThese are the back-surface images of the same subject (im
 U2 = ("<image>\nThis is the subject's AP spine radiograph. Localize each scoliotic curve (labelling "
       "the major and compensatory curves) and give the structured diagnosis.")
 NEUTRAL = ("Body-surface screening completed; an AP radiograph was obtained for further assessment.")
+DIAG_FIELD = "Appearance abnormality:"   # first structured-diagnosis field; grounding = text before it
 
 
 def _diag_messages(turn1: str):
@@ -52,8 +53,9 @@ class SpineChatPipeline:
         imgs = [rgb_path, depth_path, xray_path]
         # 1-2. screen + RAEP reliability-annotated evidence
         evidence = format_evidence(self.readout(rgb_path, depth_path))
-        # 3a. ground-first: localize WITHOUT the screening evidence (neutral Turn-1)
-        grounding = self.generate(_diag_messages(NEUTRAL), imgs, prefix="")
-        # 3b. diagnosis conditioned on grounding boxes AND the propagated evidence
-        diagnosis = self.generate(_diag_messages(evidence), imgs, prefix=grounding)
+        # 3a. ground-first: localize WITHOUT the screening evidence (neutral Turn-1); keep ONLY the
+        #     curve-localization part (everything before the first diagnosis field) as the prefix.
+        grounding = self.generate(_diag_messages(NEUTRAL), imgs, prefix="").split(DIAG_FIELD)[0]
+        # 3b. diagnosis: continue from the grounding prefix, now conditioned on the propagated evidence.
+        diagnosis = grounding + self.generate(_diag_messages(evidence), imgs, prefix=grounding)
         return {"screening_evidence": evidence, "grounding": grounding, "diagnosis": diagnosis}

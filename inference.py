@@ -49,8 +49,10 @@ def main():
         rec = {"messages": messages + [{"role": "assistant", "content": "ok"}], "images": images}
         b = tmpl.data_collator([tmpl.encode(rec)])
         b = {k: (v.to(dev) if torch.is_tensor(v) else v) for k, v in b.items()}
-        lab = b["labels"][0].cpu().numpy()
-        a0 = int((lab != -100).nonzero()[0][0])                            # assistant span start
+        lab = b["labels"][0]                                               # (T,)
+        idx = torch.nonzero(lab != -100, as_tuple=True)[0]                 # supervised (assistant) positions
+        brk = torch.nonzero(idx[1:] - idx[:-1] > 1, as_tuple=True)[0]      # run boundaries
+        a0 = int(idx[brk[-1] + 1]) if len(brk) else int(idx[0])           # start of the LAST assistant span
         ids, am = b["input_ids"][:, :a0], b["attention_mask"][:, :a0]
         inj = torch.tensor([NT + (tok.encode(prefix, add_special_tokens=False) if prefix else [])], device=dev)
         ids = torch.cat([ids, inj], 1); am = torch.cat([am, torch.ones_like(inj)], 1)
