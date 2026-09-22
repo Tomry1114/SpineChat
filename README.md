@@ -19,9 +19,34 @@ components:
 pip install -r requirements.txt
 ```
 
-`LSEMReadout`, `curvetoken`, and `raep` need only `torch`/`numpy`; `LSEMExtractor` additionally
-needs `ms-swift` + `pillow` to run the frozen VLM forward. See `train/README.md` for the training
-recipe and `raep.SpineChatPipeline` for the inference entry point.
+`LSEMReadout`, `curvetoken`, and `raep` need only `torch`/`numpy`; `LSEMExtractor` and the
+training/inference scripts additionally need `ms-swift` + `pillow`.
+
+## Usage
+
+**Training** — three sequential stages (provide your own data; none ships with this repo):
+
+```bash
+# S1  base multimodal SFT (LoRA, language-modeling loss)
+MODEL=Qwen/Qwen3.5-4B DATA=data/train.jsonl bash train/s1_base_sft.sh
+
+# S2  LSEM readout on the frozen VLM's mid-layer grid
+#     (feats_train.npz is produced by lsem.extract.LSEMExtractor: X + y_<concept>)
+python train/s2_lsem.py --features feats_train.npz \
+    --concepts lateral shoulder trunk xray --out lsem_readout.pt
+
+# S3  CurveToken continue-training (resumes the S1 adapter)
+python train/s3_curvetoken.py --model Qwen/Qwen3.5-4B \
+    --adapter outputs/s1_base_sft/checkpoint-XXX \
+    --data data/grounding_train.jsonl --out outputs/s3_curvetoken
+```
+
+**Inference** — end-to-end (screen → ground-first localize → structured diagnosis):
+
+```bash
+python inference.py --model Qwen/Qwen3.5-4B --adapter outputs/s3_curvetoken \
+    --lsem lsem_readout.pt --rgb rgb.png --depth depth.png --xray xray.png
+```
 
 ## Data
 
