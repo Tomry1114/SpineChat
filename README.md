@@ -19,9 +19,6 @@ components:
 pip install -r requirements.txt
 ```
 
-`LSEMReadout`, `curvetoken`, and `raep` need only `torch`/`numpy`; `LSEMExtractor` and the
-training/inference scripts additionally need `ms-swift` + `pillow`.
-
 ## Usage
 
 **Training** — three sequential stages (provide your own data; none ships with this repo):
@@ -61,17 +58,6 @@ The reference code targets a Qwen-family VLM via ms-swift (single image-placehol
 `image_grid_thw`; grounding tokens `<|object_ref_start|>` / `<|box_start|>`). For other backbones,
 pass your own `model`/`template`, set `img_token_id` / `merge` for LSEM, and pass the appropriate
 carrier-token string to CurveToken.
-
-## Citation
-
-```bibtex
-@article{spinechat,
-  title  = {SpineChat: Latent Spatial Evidence, CurveToken Grounding, and Reliability-Aware
-            Evidence Propagation for Radiation-Free Scoliosis Screening and Diagnosis},
-  author = {...},
-  year   = {2026}
-}
-```
 
 ## License
 
