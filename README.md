@@ -19,7 +19,7 @@ components:
 pip install -r requirements.txt
 ```
 
-## Usage
+## Training and Inference
 
 **Training** — three sequential stages (provide your own data; none ships with this repo):
 
