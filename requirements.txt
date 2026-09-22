@@ -1,0 +1,4 @@
+torch>=2.1
+numpy>=1.24
+pillow>=9.0
+ms-swift>=3.0          # only for LSEMExtractor / load_swift_vlm (frozen VLM forward). LSEMReadout needs only torch+numpy.

@@ -1,0 +1,30 @@
+# ---- patient-derived data (NEVER commit) ----
+data/
+nanmeng_dataset/
+*.jsonl
+*.png
+*.jpg
+*.jpeg
+*.dcm
+*.nii
+*.nii.gz
+# ---- model / feature artifacts ----
+outputs/
+runs/
+logs/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.pkl
+*.npz
+*.npy
+# ---- python ----
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.DS_Store
