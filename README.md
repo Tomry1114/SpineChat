@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 ## Training and Inference
 
-**Training** — three sequential stages (provide your own data; none ships with this repo):
+**Training**
 
 ```bash
 # S1  base multimodal SFT (LoRA, language-modeling loss)
